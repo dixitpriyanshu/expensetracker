@@ -13,11 +13,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from django.contrib import messages
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -136,3 +137,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MESSAGE_TAGS = {
     messages.ERROR : 'danger'
 }
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'priyanshudixit404@gmail.com'
+EMAIL_USE_TLS = True
+DEFAILT_FROM_EMAIL = 'priyanshudixit404@gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = 'jygquefjolxlhjwd'
