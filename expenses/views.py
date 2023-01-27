@@ -60,7 +60,7 @@ def add_expense(request):
         
         return redirect('expenses')
 
-
+@login_required(login_url='/authentication/login')
 def edit_expense(request, id):
     expense = Expense.objects.get(pk=id)
     categories = Category.objects.all()
