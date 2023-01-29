@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Income
+{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    
+    <div class="row">
+        <div class="col-md-10">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'income' %}">Income</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Summary</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-2 float-end">
+            <a href="" class="btn btn-primary">Back</a>
+        </div>
+    </div>
+
+
+    <div>
+        <canvas id="myChart""></canvas>
+      </div>
+      
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/income_stats.js' %}"></script>
+
+{% endblock %}

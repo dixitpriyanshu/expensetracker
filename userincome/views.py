@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 import json
 from django.http import JsonResponse
 from userpreferences.models import UserPreference
-
+import datetime
 # Create your views here.
 
 
@@ -101,3 +101,30 @@ def delete_income(request, id):
     income.delete()
     messages.success(request, 'Income removed.')
     return redirect('income')
+
+def income_source_summary(request):
+    todays_date = datetime.date.today()
+    six_months_ago = todays_date - datetime.timedelta(days= 30*6)
+    incomes = UserIncome.objects.filter(owner = request.user, date__gte = six_months_ago, date__lte = todays_date)
+
+    finalrep = {}
+    def get_source(income):
+        return income.source
+
+    def get_income_source_amount(source):
+        amount = 0
+        filtered_by_category = incomes.filter(source = source)
+        for item in filtered_by_category:
+            amount += item.amount
+        return amount
+
+    source_list = list(set(map(get_source, incomes)))
+
+    for income in incomes:
+        for source in source_list:
+            finalrep[source] = get_income_source_amount(source)
+
+    return JsonResponse({'income_source_data': finalrep}, safe= False)
+
+def stats_view(request):
+    return render(request, 'income/stats.html')
