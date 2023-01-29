@@ -4,9 +4,10 @@ from django.contrib.auth.decorators import login_required
 from .models import UserIncome, Source
 from django.core.paginator import Paginator
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from userpreferences.models import UserPreference
 import datetime
+import csv
 # Create your views here.
 
 
@@ -128,3 +129,16 @@ def income_source_summary(request):
 
 def stats_view(request):
     return render(request, 'income/stats.html')
+
+def export_csv(request):
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Income'+str(datetime.datetime.now())+'.csv'
+    writer = csv.writer(response)
+    writer.writerow(['Amount', 'Description', 'Source', 'Date'])
+
+    incomes = UserIncome.objects.filter(owner =request.user)
+    for income in incomes:
+        writer.writerow([income.amount, income.description, income.source, income.date])
+
+    return response

@@ -12,4 +12,5 @@ urlpatterns = [
     path('search-income', csrf_exempt(views.search_income), name='search_income'),
     path('income-source-summary', views.income_source_summary, name='income-source-summary'),
     path('stats', views.stats_view, name='income-stats'),
+    path('export-csv', views.export_csv, name='income-export-csv'),
 ]
