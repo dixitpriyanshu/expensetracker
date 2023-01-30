@@ -61,6 +61,9 @@ def add_income(request):
     
     if request.method == 'POST':
         amount = request.POST['amount']
+        if float(amount) <= 0:
+            messages.error(request, 'Income amount must be greater than zero')
+            return render(request, "income/add_income.html", context)
         description = request.POST['description']
         source = request.POST['source']
         date = request.POST['income_date']

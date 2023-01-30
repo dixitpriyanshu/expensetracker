@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponse
 from userpreferences.models import UserPreference
 import datetime
 import csv
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 # Create your views here.
 
@@ -25,6 +25,12 @@ def update_total_expense(sender, instance, **kwargs):
     except TotalExpense.DoesNotExist:
         TotalExpense.objects.create(category=category, amount=amount, owner=owner)
 
+@receiver(pre_save, sender=Expense)
+def check_expense_limit(sender, instance, **kwargs):
+    today = datetime.datetime.now().date()
+    count = Expense.objects.filter(owner=instance.owner, date=today).count()
+    if count > 10:
+        raise ValueError('Maximum number of expenses reached for today')
 
 def search_expenses(request):
     if request.method == 'POST':
@@ -64,6 +70,10 @@ def add_expense(request):
     
     if request.method == 'POST':
         amount = request.POST['amount']
+        if float(amount) <= 0:
+            messages.error(request, 'Expense amount must be greater than zero')
+            return render(request, "expenses/add_expense.html", context)
+        
         description = request.POST['description']
         category = request.POST['category']
         date = request.POST['expense_date']
