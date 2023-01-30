@@ -10,6 +10,6 @@ urlpatterns = [
     path('validate-username', csrf_exempt(UsernameValidationView.as_view()), name='validate-username'),
     path('validate-email', csrf_exempt(EmailValidationView.as_view()), name='validate-email'),
     path('activate/<uid>/<token>', VerifivationView.as_view(), name='activate'),
-    path('/request-reset-link', RequestPasswordResetEmail.as_view(), name='request-password'),
-    path('/set-new-password/<uid>/<token>', CompletePasswordReset.as_view(), name='reset-user-password'),
+    path('request-reset-link', RequestPasswordResetEmail.as_view(), name='request-password'),
+    path('set-new-password/<uid>/<token>', CompletePasswordReset.as_view(), name='reset-user-password'),
 ]

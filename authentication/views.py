@@ -14,9 +14,17 @@ from .utils import token_generator
 from django.contrib import auth
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import threading
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from userpreferences.models import UserPreference
+
 
 # Create your views here.
 
+@receiver(post_save, sender=User)
+def create_default_preference(sender, instance, created, **kwargs):
+    if created:
+        UserPreference.objects.create(user=instance, currency ='INR')
 
 class EmailThread(threading.Thread):
     

@@ -1,14 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Category, Expense
+from .models import Category, Expense, TotalExpense
 from django.core.paginator import Paginator
 import json
 from django.http import JsonResponse, HttpResponse
 from userpreferences.models import UserPreference
 import datetime
 import csv
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 # Create your views here.
+
+@receiver(post_save, sender=Expense)
+def update_total_expense(sender, instance, **kwargs):
+    category = instance.category
+    amount = int(instance.amount)
+    owner = instance.owner
+    try:
+        total_expense = TotalExpense.objects.get(category=category, owner=owner)
+        current_total = int(total_expense.amount)
+        total_expense.amount = current_total + amount
+        total_expense.save()
+    except TotalExpense.DoesNotExist:
+        TotalExpense.objects.create(category=category, amount=amount, owner=owner)
 
 
 def search_expenses(request):
@@ -111,7 +126,7 @@ def expense_category_summary(request):
     todays_date = datetime.date.today()
     six_months_ago = todays_date - datetime.timedelta(days= 30*6)
     expenses = Expense.objects.filter(owner = request.user, date__gte = six_months_ago, date__lte = todays_date)
-
+    
     finalrep = {}
     def get_category(expense):
         return expense.category
@@ -132,7 +147,20 @@ def expense_category_summary(request):
     return JsonResponse({'expense_category_data': finalrep}, safe= False)
 
 def stats_view(request):
-    return render(request, 'expenses/stats.html')
+    total_expenses= TotalExpense.objects.filter(owner = request.user)
+    paginator = Paginator(total_expenses, 5)
+    page_number = request.GET.get('page')
+    page_obj = Paginator.get_page(paginator, page_number)
+    if UserPreference.objects.filter(user= request.user).exists():
+        currency = UserPreference.objects.get(user= request.user).currency
+    else:
+        currency = 'INR'
+    context = {
+        'total_expenses': total_expenses,
+        'page_obj': page_obj,
+        'currency': currency
+    }
+    return render(request, 'expenses/stats.html', context)
 
 def export_csv(request):
     

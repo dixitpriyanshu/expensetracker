@@ -142,8 +142,8 @@ MESSAGE_TAGS = {
 
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'priyanshudixit404@gmail.com'
+EMAIL_HOST_USER = 'priyanshu.dixit.2910@gmail.com'
 EMAIL_USE_TLS = True
-DEFAILT_FROM_EMAIL = 'priyanshudixit404@gmail.com'
+DEFAILT_FROM_EMAIL = 'priyanshu.dixit.2910@gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = 'jygquefjolxlhjwd'
+EMAIL_HOST_PASSWORD = 'pmkekzalzdusylgf'
