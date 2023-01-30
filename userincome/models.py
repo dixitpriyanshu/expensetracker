@@ -20,3 +20,11 @@ class Source(models.Model):
 
     def __str__(self):
         return self.name
+
+class TotalIncome(models.Model):
+    source = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='incomes')
+
+    def __str__(self):
+        return f'{self.source} - {self.amount} - {self.owner}'

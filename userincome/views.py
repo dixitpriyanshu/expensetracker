@@ -1,14 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import UserIncome, Source
+from .models import UserIncome, Source, TotalIncome
 from django.core.paginator import Paginator
 import json
 from django.http import JsonResponse, HttpResponse
 from userpreferences.models import UserPreference
 import datetime
 import csv
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 # Create your views here.
+
+@receiver(post_save, sender=UserIncome)
+def update_total_income(sender, instance, **kwargs):
+    source = instance.source
+    amount = int(instance.amount)
+    owner = instance.owner
+    try:
+        total_income = TotalIncome.objects.get(source=source, owner=owner)
+        current_total = int(total_income.amount)
+        total_income.amount = current_total + amount
+        total_income.save()
+    except TotalIncome.DoesNotExist:
+        TotalIncome.objects.create(source=source, amount=amount, owner=owner)
 
 
 def search_income(request):
@@ -128,7 +143,20 @@ def income_source_summary(request):
     return JsonResponse({'income_source_data': finalrep}, safe= False)
 
 def stats_view(request):
-    return render(request, 'income/stats.html')
+    total_income= TotalIncome.objects.filter(owner = request.user)
+    paginator = Paginator(total_income, 5)
+    page_number = request.GET.get('page')
+    page_obj = Paginator.get_page(paginator, page_number)
+    if UserPreference.objects.filter(user= request.user).exists():
+        currency = UserPreference.objects.get(user= request.user).currency
+    else:
+        currency = 'INR'
+    context = {
+        'total_income': total_income,
+        'page_obj': page_obj,
+        'currency': currency,
+    }
+    return render(request, 'income/stats.html', context)
 
 def export_csv(request):
     
